@@ -24,21 +24,24 @@ public class CheatActivity extends LoggingActivity {
         if (savedInstanceState != null) {
             cheatUsed = savedInstanceState.getBoolean(KEY_CHEAT_USED);
             if (cheatUsed) {
-                setResult(Activity.RESULT_OK);
+                setCheatUsed();
             }
         }
 
         findViewById(R.id.show_correct_answer).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean correctAnswer = getIntent().getBooleanExtra(KEY_CORRECT_ANSWER, false);
-
-                TextView correctAnswerView = findViewById(R.id.correct_answer);
-                correctAnswerView.setText(String.valueOf(correctAnswer));
                 cheatUsed = true;
-                setResult(Activity.RESULT_OK);
+                setCheatUsed();
             }
         });
+    }
+
+    private void setCheatUsed() {
+        boolean correctAnswer = getIntent().getBooleanExtra(KEY_CORRECT_ANSWER, false);
+        TextView correctAnswerView = findViewById(R.id.correct_answer);
+        correctAnswerView.setText(String.valueOf(correctAnswer));
+        setResult(Activity.RESULT_OK);
     }
 
     @Override

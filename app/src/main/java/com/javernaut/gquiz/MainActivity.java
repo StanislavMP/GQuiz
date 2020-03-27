@@ -15,6 +15,8 @@ public class MainActivity extends LoggingActivity {
 
     private static final int REQUEST_CODE_CHEAT = 42;
     private static final int REQUEST_CODE_CHEAT_2 = 423;
+    private static final int CORRECT_ANSWER = 1;
+    private static final int INCORRECT_ANSWER = -1;
 
     private static final String KEY_CURRENT_QUESTION_INDEX = "key_current_question_index";
     private static final String KEY_ANSWERED_QUESTION_ARRAY = "key_answeredQuestion_Array";
@@ -38,8 +40,6 @@ public class MainActivity extends LoggingActivity {
     };
 
     private int currentQuestionIndex = 0;
-    private int answeredCount = 0;
-    private int answeredCorrectCount = 0;
     private int[] answeredQuestion = new int[mQuestionBank.length];
 
     @Override
@@ -50,8 +50,6 @@ public class MainActivity extends LoggingActivity {
         if (savedInstanceState != null) {
             currentQuestionIndex = savedInstanceState.getInt(KEY_CURRENT_QUESTION_INDEX);
             answeredQuestion = savedInstanceState.getIntArray(KEY_ANSWERED_QUESTION_ARRAY);
-            answeredCount = savedInstanceState.getInt(KEY_ANSWERED_QUESTION_COUNT);
-            answeredCorrectCount = savedInstanceState.getInt(KEY_ANSWERED_QUESTION_CORRECT_COUNT);
         }
 
         trueButton = findViewById(R.id.true_button);
@@ -90,9 +88,18 @@ public class MainActivity extends LoggingActivity {
         statsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int answeredCount = 0;
+                int answeredCorrectCount = 0;
+                for (int answer : answeredQuestion){
+                    if (answer != 0 ) {
+                        answeredCount++;
+                    }
+                    if (answer == CORRECT_ANSWER){
+                        answeredCorrectCount++;
+                    }
+                }
                 startActivity(
-                        StatsActivity.makeIntent(MainActivity.this,
-                        String.format("Отвечено %d/%d вопросов\n Правильных ответов: %d", answeredCount, answeredQuestion.length, answeredCorrectCount))
+                        StatsActivity.makeIntent(MainActivity.this, answeredCount, answeredQuestion.length, answeredCorrectCount)
                 );
             }
         });
@@ -118,8 +125,6 @@ public class MainActivity extends LoggingActivity {
         super.onSaveInstanceState(outState);
         outState.putInt(KEY_CURRENT_QUESTION_INDEX, currentQuestionIndex);
         outState.putIntArray(KEY_ANSWERED_QUESTION_ARRAY, answeredQuestion);
-        outState.putInt(KEY_ANSWERED_QUESTION_COUNT, answeredCount);
-        outState.putInt(KEY_ANSWERED_QUESTION_CORRECT_COUNT, answeredCorrectCount);
     }
 
     @Override
@@ -143,16 +148,7 @@ public class MainActivity extends LoggingActivity {
 
     private void onAnswerSelected(boolean currentAnswer) {
         boolean wasTheAnswerCorrect = currentAnswer == getCurrentQuestion().getCorrectAnswer();
-        if (answeredQuestion[currentQuestionIndex] == 0 ) {
-            answeredCount++;
-        }
-        if (wasTheAnswerCorrect && answeredQuestion[currentQuestionIndex] < 1){
-            answeredCorrectCount++;
-        }
-        if (!wasTheAnswerCorrect && answeredQuestion[currentQuestionIndex] == 1){
-            answeredCorrectCount--;
-        }
-        answeredQuestion[currentQuestionIndex] = (wasTheAnswerCorrect ? 1 : -1);
+        answeredQuestion[currentQuestionIndex] = (wasTheAnswerCorrect ? CORRECT_ANSWER : INCORRECT_ANSWER);
         showToast(wasTheAnswerCorrect ? R.string.correct_toast : R.string.incorrect_toast);
     }
 
