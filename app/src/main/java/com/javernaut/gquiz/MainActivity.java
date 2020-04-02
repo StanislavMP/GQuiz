@@ -69,7 +69,9 @@ public class MainActivity extends LoggingActivity {
         findViewById(R.id.see_all_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, AllQuestionsActivity.class));
+                Intent intent = new Intent(MainActivity.this, AllQuestionsActivity.class);
+                intent.putExtra(Question.class.getSimpleName(), QUESTION_BANK);
+                startActivity(intent);
             }
         });
     }
